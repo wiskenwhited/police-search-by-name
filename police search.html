@@ -1,0 +1,98 @@
+<html>
+  <head>
+    <title>Police Search By Name</title>
+    <style>
+      .container {
+        margin: 20px;
+        font-size: 20px;
+      }
+
+      .div-result {
+        margin: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <input id="clue" />
+      <button onclick="onClickSearch();">Search</button>
+      <div id="result" class="div-result"></div>
+    </div>
+  </body>
+  <script>
+    class Criminal {
+      constructor(name = null, aliases = null) {
+        this.name = name;
+        this.aliases = aliases;
+      }
+      set(name, aliases) {
+        this.name = name;
+        this.aliases = aliases;
+      }
+    }
+
+    class Map {
+      constructor() {
+        this.criminals = [];
+      }
+      set(name, aliases) {
+        this.criminals.push(new Criminal(name, aliases));
+      }
+      search(clue) {
+        let candidates;
+        let candidateWithSameName = this.criminals.find(
+          criminal => criminal.name.toLowerCase() === clue.toLowerCase()
+        );
+
+        if (candidateWithSameName) {
+          candidates = this.criminals.filter(
+            criminal => criminal.name.toLowerCase() === clue.toLowerCase()
+          );
+        } else {
+          candidates = this.criminals.filter(criminal =>
+            criminal.name.toLowerCase().includes(clue.toLowerCase())
+          );
+        }
+
+        if (candidates.length > 0) {
+          // candidates by actual names
+          return candidates;
+        } else {
+          // candidates by aliases
+          candidates = this.criminals.filter(
+            criminal =>
+              criminal.aliases &&
+              criminal.aliases.toLowerCase().includes(clue.toLowerCase())
+          );
+
+          return candidates;
+        }
+      }
+    }
+
+    let criminals = new Map();
+
+    criminals.set("Paul White", "Roger Night, Peter Long Jr.");
+    criminals.set("Roger Fedexer", "Rob Ford, pete Lord, Roger McWire");
+    criminals.set("Paul White Jr.", null);
+    criminals.set("Red Fortress", "Roger Rabbit, Ross Winter");
+    criminals.set("Redford Fort", "Red Strong, Red Fort");
+
+    function onClickSearch() {
+      const clue = document.getElementById("clue").value;
+      const candidates = criminals.search(clue);
+      let result = "";
+
+      candidates.forEach(candidate => {
+        const firstName = candidate.name.split(" ")[0];
+
+        result += `<div>First Name: ${firstName}, Aliases: ${candidate.aliases}</div>`;
+      });
+
+      let resultDiv = document.getElementById("result");
+
+      if (candidates.length) resultDiv.innerHTML = result;
+      else resultDiv.innerText = "No match";
+    }
+  </script>
+</html>
